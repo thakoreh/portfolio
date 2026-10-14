@@ -10,6 +10,11 @@ module.exports = merge(common, {
     path: path.resolve(__dirname, 'dist'),
     clean: true
   },
+  devServer: {
+    client: {
+      overlay: { errors: true, warnings: false }
+    }
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/template.html',
