@@ -1,37 +1,36 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const common = require('./webpack.common');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
   output: {
-    filename: '[name].[contentHash].bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    filename: '[name].[contenthash].bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    clean: true
   },
   optimization: {
     minimizer: [
-      new OptimizeCssAssetsPlugin(),
-      new TerserPlugin(),
-      new HtmlWebpackPlugin({
-        template: './src/template.html',
-        favicon: './src/assets/favicon.png',
-        minify: {
-          removeAttributeQuotes: true,
-          collapseWhitespace: true,
-          removeComments: true
-        }
-      })
+      new CssMinimizerPlugin(),
+      new TerserPlugin()
     ]
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: './src/template.html',
+      favicon: './src/assets/favicon.png',
+      minify: {
+        removeAttributeQuotes: true,
+        collapseWhitespace: true,
+        removeComments: true
+      }
+    }),
     new MiniCssExtractPlugin({
-      filename: '[name].[contentHash].css'
+      filename: '[name].[contenthash].css'
     })
   ],
   module: {
@@ -40,7 +39,10 @@ module.exports = merge(common, {
         test: /\.scss$/,
         use: [
           MiniCssExtractPlugin.loader, //3. Extract css into files
-          'css-loader', //2. Turns css into commonjs
+          {
+            loader: 'css-loader',
+            options: { esModule: true, url: true }
+          }, //2. Resolves CSS imports and asset URLs
           'sass-loader'
         ] //1. Turns sass into css
       }
