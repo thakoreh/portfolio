@@ -4,14 +4,17 @@ import initSr from './js/sr';
 import './style/main.scss';
 
 $('a[href^="#"]').on('click', function(event) {
-  var target = $(this.getAttribute('href'));
-  if (target.length) {
+  const href = this.getAttribute('href');
+  if (href === '#' || href === '#!' || href.length < 2) return;
+
+  const el = document.getElementById(decodeURIComponent(href.slice(1)));
+  if (el) {
     event.preventDefault();
     $('html, body')
       .stop()
       .animate(
         {
-          scrollTop: target.offset().top
+          scrollTop: $(el).offset().top
         },
         1000
       );

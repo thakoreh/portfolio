@@ -1,13 +1,19 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const common = require('./webpack.common');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const path = require('path');
 
 module.exports = merge(common, {
   mode: 'development',
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'dist')
+    path: path.resolve(__dirname, 'dist'),
+    clean: true
+  },
+  devServer: {
+    client: {
+      overlay: { errors: true, warnings: false }
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -21,7 +27,10 @@ module.exports = merge(common, {
         test: /\.scss$/,
         use: [
           'style-loader', //3. Inject styles into DOM
-          'css-loader', //2. Turns css into commonjs
+          {
+            loader: 'css-loader',
+            options: { esModule: true, url: true }
+          }, //2. Resolves CSS imports and asset URLs
           'sass-loader'
         ] //1. Turns sass into css
       }
